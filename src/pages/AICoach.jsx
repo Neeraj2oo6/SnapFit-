@@ -33,6 +33,7 @@ export const AICoach = () => {
   const [editingCardId, setEditingCardId] = useState(null);
   const [editFormData, setEditFormData] = useState({});
   const [savedCardIds, setSavedCardIds] = useState(new Set());
+  const [showMobileTips, setShowMobileTips] = useState(false);
   const chatEndRef = useRef(null);
 
   const scrollToBottom = () => {
@@ -268,27 +269,29 @@ export const AICoach = () => {
   };
 
   return (
-    <div className="h-[calc(100vh-140px)] flex flex-col md:flex-row rounded-3xl bg-white dark:bg-[#14213D] border border-slate-200/80 dark:border-slate-800 shadow-sm overflow-hidden">
+    <div className="flex-1 min-h-[480px] h-full flex flex-col md:flex-row rounded-3xl bg-white dark:bg-[#14213D] border border-slate-200/80 dark:border-slate-800 shadow-sm overflow-hidden">
       
-      {/* Left Context & Suggestions Sidebar */}
-      <div className="w-full md:w-80 border-r border-slate-200/80 dark:border-slate-800 p-4 flex flex-col justify-between shrink-0 bg-slate-50/50 dark:bg-slate-950/40">
-        <div>
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center space-x-2">
-              <Bot className="w-5 h-5 text-[#087F5B] dark:text-emerald-400" />
-              <h3 className="text-sm font-bold text-slate-900 dark:text-white">Food Chat Engine</h3>
-            </div>
-            <button
-              onClick={handleClearHistory}
-              className="p-1.5 text-slate-400 hover:text-rose-500 rounded-lg transition-colors"
-              title="Clear Chat History"
-            >
-              <Trash2 className="w-4 h-4" />
-            </button>
+      {/* Left Context & Suggestions Sidebar (Desktop) */}
+      <div className="hidden md:flex flex-col w-72 lg:w-80 border-r border-slate-200/80 dark:border-slate-800 shrink-0 bg-slate-50/50 dark:bg-slate-950/40 min-h-0 overflow-hidden">
+        {/* Left Header */}
+        <div className="px-4 py-3.5 border-b border-slate-200/80 dark:border-slate-800 flex items-center justify-between shrink-0">
+          <div className="flex items-center space-x-2">
+            <Bot className="w-5 h-5 text-[#087F5B] dark:text-emerald-400 shrink-0" />
+            <h3 className="text-sm font-bold text-slate-900 dark:text-white truncate">Food Chat Engine</h3>
           </div>
+          <button
+            onClick={handleClearHistory}
+            className="p-1.5 text-slate-400 hover:text-rose-500 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+            title="Clear Chat History"
+          >
+            <Trash2 className="w-4 h-4" />
+          </button>
+        </div>
 
+        {/* Scrollable Content inside Left Sidebar */}
+        <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden p-4 space-y-4">
           {/* Today's Live Nutritional Context */}
-          <div className="p-3.5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/70 dark:border-slate-800 mb-4 shadow-sm text-xs space-y-2">
+          <div className="p-3.5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/70 dark:border-slate-800 shadow-sm text-xs space-y-2">
             <span className="text-[10px] font-black uppercase text-[#087F5B] dark:text-emerald-400 block tracking-wider">
               Today's Live Balance
             </span>
@@ -334,7 +337,8 @@ export const AICoach = () => {
           </div>
         </div>
 
-        <div className="pt-4 border-t border-slate-200/80 dark:border-slate-800">
+        {/* Footer in Left Sidebar */}
+        <div className="p-3.5 border-t border-slate-200/80 dark:border-slate-800 shrink-0">
           <button
             onClick={() => navigate('/snap-food')}
             className="w-full py-2.5 px-3 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-[#EFFAF5] hover:text-[#087F5B] text-slate-700 dark:text-slate-200 font-bold text-xs flex items-center justify-center space-x-1.5 transition-colors"
@@ -345,10 +349,78 @@ export const AICoach = () => {
       </div>
 
       {/* Right: Interactive Chat Stream */}
-      <div className="flex-1 flex flex-col justify-between h-full bg-white dark:bg-[#14213D]">
+      <div className="flex-1 flex flex-col min-w-0 min-h-0 h-full bg-white dark:bg-[#14213D] overflow-hidden">
         
-        {/* Messages Container */}
-        <div className="flex-1 p-4 sm:p-6 overflow-y-auto space-y-4">
+        {/* Chat Header */}
+        <div className="px-4 sm:px-6 py-3.5 border-b border-slate-200/80 dark:border-slate-800 flex items-center justify-between bg-white dark:bg-[#14213D] shrink-0 z-10">
+          <div className="flex items-center space-x-3 min-w-0">
+            <div className="w-9 h-9 rounded-2xl bg-[#087F5B]/10 dark:bg-emerald-500/10 text-[#087F5B] dark:text-emerald-400 flex items-center justify-center shrink-0">
+              <Bot className="w-5 h-5" />
+            </div>
+            <div className="min-w-0">
+              <h2 className="text-sm font-bold text-slate-900 dark:text-white flex items-center space-x-2 truncate">
+                <span className="truncate">Food & Water AI Coach</span>
+                <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0 animate-pulse" />
+              </h2>
+              <p className="text-[11px] text-slate-400 font-medium truncate">
+                Instant AI Food Recognition & Nutrition Logging
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center space-x-2 shrink-0">
+            {/* Mobile Stats & Prompts Toggle */}
+            <button
+              onClick={() => setShowMobileTips(!showMobileTips)}
+              className="md:hidden px-2.5 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:text-[#087F5B] text-xs font-semibold flex items-center space-x-1 transition-colors"
+              title="Today's Balance & Prompts"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-[#087F5B] dark:text-emerald-400" />
+              <span>{showMobileTips ? 'Close Tips' : 'Tips & Stats'}</span>
+            </button>
+            <button
+              onClick={handleClearHistory}
+              className="p-2 text-slate-400 hover:text-rose-500 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+              title="Clear Chat History"
+            >
+              <Trash2 className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+
+        {/* Collapsible Mobile Tips & Quick Prompts Drawer */}
+        {showMobileTips && (
+          <div className="md:hidden p-3 border-b border-slate-200/80 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/90 max-h-56 overflow-y-auto space-y-2 shrink-0 animate-in slide-in-from-top-2 duration-150">
+            <div className="grid grid-cols-2 gap-2 text-[11px] font-semibold text-slate-600 dark:text-slate-300">
+              <div className="p-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-200/60 dark:border-slate-700">
+                Calories: <strong className="text-slate-900 dark:text-white">{totals.calories} / {targets.dailyCalories}</strong>
+              </div>
+              <div className="p-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-200/60 dark:border-slate-700">
+                Protein: <strong className="text-slate-900 dark:text-white">{totals.protein} / {targets.proteinGrams}g</strong>
+              </div>
+            </div>
+            <div className="space-y-1">
+              <span className="text-[10px] font-bold uppercase text-slate-400 block">Try Logging:</span>
+              <div className="flex flex-wrap gap-1.5">
+                {quickFoodPrompts.map((p, i) => (
+                  <button
+                    key={i}
+                    onClick={() => {
+                      handleSendMessage(p);
+                      setShowMobileTips(false);
+                    }}
+                    className="px-2.5 py-1 rounded-lg bg-white dark:bg-slate-800 border border-slate-200/60 dark:border-slate-700 text-[11px] text-slate-700 dark:text-slate-300 hover:border-[#087F5B]"
+                  >
+                    "{p}"
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Scrollable Message Area */}
+        <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden p-4 sm:p-6 space-y-4">
           {messages.map((msg) => {
             const isUser = msg.role === 'user' || msg.sender === 'user';
             const cardId = msg.id;
@@ -593,8 +665,8 @@ export const AICoach = () => {
           <div ref={chatEndRef} />
         </div>
 
-        {/* Input Bar */}
-        <div className="p-4 border-t border-slate-200/80 dark:border-slate-800 bg-white dark:bg-[#14213D]">
+        {/* Message Input Area (Pinned at Bottom) */}
+        <div className="shrink-0 p-3 sm:p-4 border-t border-slate-200/80 dark:border-slate-800 bg-white dark:bg-[#14213D] z-10">
           <form
             onSubmit={(e) => {
               e.preventDefault();
@@ -613,7 +685,8 @@ export const AICoach = () => {
             <button
               type="submit"
               disabled={!inputText.trim() || isTyping}
-              className="p-3 rounded-2xl bg-[#087F5B] hover:bg-[#056B4A] disabled:opacity-50 text-white font-bold shadow-md shadow-[#087F5B]/20 transition-all flex items-center justify-center"
+              className="p-3 rounded-2xl bg-[#087F5B] hover:bg-[#056B4A] disabled:opacity-50 text-white font-bold shadow-md shadow-[#087F5B]/20 transition-all flex items-center justify-center shrink-0"
+              title="Send Message"
             >
               <Send className="w-4 h-4" />
             </button>
