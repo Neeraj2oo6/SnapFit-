@@ -96,9 +96,9 @@ export const Header = ({ onOpenMobileNav }) => {
   };
 
   return (
-    <header className="sticky top-0 z-20 h-20 bg-white/90 dark:bg-[#14213D]/90 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800 px-4 sm:px-8 flex items-center justify-between transition-colors">
+    <header className="sticky top-0 z-30 w-full shrink-0 h-20 bg-white/90 dark:bg-[#14213D]/90 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800 px-4 sm:px-8 flex items-center justify-between transition-colors">
       {/* Left: Mobile trigger & Welcome text */}
-      <div className="flex items-center space-x-3">
+      <div className="flex items-center space-x-3 shrink-0">
         <button
           onClick={onOpenMobileNav}
           className="lg:hidden p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
@@ -121,7 +121,7 @@ export const Header = ({ onOpenMobileNav }) => {
       </div>
 
       {/* Center: Search Box */}
-      <div ref={searchRef} className="relative hidden md:flex items-center flex-1 max-w-md mx-6 lg:mx-10">
+      <div ref={searchRef} className="relative hidden md:flex items-center flex-1 max-w-md mx-4 lg:mx-8 min-w-0">
         <form onSubmit={handleSearchSubmit} className="relative w-full">
           <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
           <input
@@ -164,11 +164,11 @@ export const Header = ({ onOpenMobileNav }) => {
       </div>
 
       {/* Right Action Icons & User Dropdown */}
-      <div className="flex items-center space-x-2 sm:space-x-3">
+      <div className="flex items-center space-x-2 sm:space-x-3 shrink-0 ml-auto">
         {/* Theme Toggle */}
         <button
           onClick={toggleTheme}
-          className="p-2.5 rounded-2xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+          className="p-2.5 rounded-2xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors shrink-0"
           title="Toggle Theme"
         >
           {theme === 'dark' ? (
@@ -179,7 +179,7 @@ export const Header = ({ onOpenMobileNav }) => {
         </button>
 
         {/* Notification Bell */}
-        <div className="relative">
+        <div className="relative shrink-0">
           <button
             onClick={() => setShowNotifications(!showNotifications)}
             className="relative p-2.5 rounded-2xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
@@ -197,31 +197,31 @@ export const Header = ({ onOpenMobileNav }) => {
         </div>
 
         {/* User Profile Avatar with Name and Dropdown */}
-        <div ref={profileRef} className="relative">
+        <div ref={profileRef} className="relative shrink-0">
           <button
             onClick={() => setShowProfileDropdown(!showProfileDropdown)}
-            className="flex items-center space-x-2.5 p-1.5 sm:px-2.5 sm:py-1.5 rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+            className="flex items-center space-x-2 sm:space-x-2.5 p-1 sm:px-2.5 sm:py-1.5 rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors max-w-[200px] sm:max-w-[240px]"
           >
             <img
               src={user?.avatar || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&auto=format&fit=crop&q=80"}
               alt="Avatar"
-              className="w-8 h-8 rounded-full object-cover border-2 border-[#087F5B]"
+              className="w-8 h-8 rounded-full object-cover border-2 border-[#087F5B] shrink-0"
             />
-            <span className="text-sm font-bold text-slate-900 dark:text-white hidden sm:block">
-              {user?.name || "Rahul Sharma"}
+            <span className="text-sm font-bold text-slate-900 dark:text-white hidden sm:block truncate max-w-[120px] sm:max-w-[140px] text-left">
+              {user?.name || "Neeraj Patel"}
             </span>
-            <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform ${showProfileDropdown ? 'rotate-180' : ''}`} />
+            <ChevronDown className={`w-4 h-4 text-slate-400 shrink-0 transition-transform ${showProfileDropdown ? 'rotate-180' : ''}`} />
           </button>
 
           {/* User Profile Dropdown Menu */}
           {showProfileDropdown && (
             <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-[#14213D] rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xl p-2 z-50 animate-in fade-in zoom-in-95 duration-150">
               <div className="px-3 py-2 border-b border-slate-100 dark:border-slate-800/80 mb-1">
-                <p className="text-xs font-black text-slate-900 dark:text-white">
-                  {user?.name || "Rahul Sharma"}
+                <p className="text-xs font-black text-slate-900 dark:text-white truncate">
+                  {user?.name || "Neeraj Patel"}
                 </p>
                 <p className="text-[11px] text-slate-400 truncate">
-                  {user?.email || "rahul.sharma@snapfit.ai"}
+                  {user?.email || "neerajpatelmrj56@gmail.com"}
                 </p>
               </div>
 
