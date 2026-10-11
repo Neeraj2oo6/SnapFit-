@@ -1,0 +1,57 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper function to check if requester is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Helper function to verify user is accessing only their own data
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // User document and all user-specific collections
+    match /users/{userId} {
+      // User profile root document
+      allow read, write: if isOwner(userId);
+
+      // Subcollections required by SnapFit
+      match /meals/{mealId} {
+        allow read, write: if isOwner(userId);
+      }
+
+      match /water/{waterId} {
+        allow read, write: if isOwner(userId);
+      }
+
+      match /foodAnalyses/{analysisId} {
+        allow read, write: if isOwner(userId);
+      }
+
+      match /barcodeHistory/{barcodeId} {
+        allow read, write: if isOwner(userId);
+      }
+
+      match /chatHistory/{chatId} {
+        allow read, write: if isOwner(userId);
+      }
+
+      match /profile/{profileDoc} {
+        allow read, write: if isOwner(userId);
+      }
+
+      // Any nested subcollections for this user only
+      match /{allSubcollections=**} {
+        allow read, write: if isOwner(userId);
+      }
+    }
+
+    // Shared food cache database (foodDatabase/{foodKey})
+    match /foodDatabase/{foodKey} {
+      // Authenticated users can read cached nutrition data and contribute newly identified items
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated();
+    }
+  }
+}

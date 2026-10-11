@@ -1,0 +1,36 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Helper function to check if requester is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Helper function to verify user is accessing only their own folder
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // Secure foodImages/{userId}/{imageName}
+    match /foodImages/{userId}/{imageName} {
+      // Allow read to the authenticated owner
+      allow read: if isOwner(userId);
+
+      // Allow write/upload only if:
+      // 1. User is authenticated and owner of this folder
+      // 2. Uploaded file is an image
+      // 3. File size is under 10MB
+      allow write: if isOwner(userId)
+                   && request.resource.contentType.matches('image/.*')
+                   && request.resource.size < 10 * 1024 * 1024;
+      
+      // Allow deletion only by the owner
+      allow delete: if isOwner(userId);
+    }
+
+    // Default deny all other paths
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}
