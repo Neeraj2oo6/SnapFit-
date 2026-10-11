@@ -40,26 +40,35 @@ export const mealService = {
     const currentTime = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
     // Standardize nutrition source & input method
-    const inputMethod = meal.method || meal.source || 'camera';
+    const inputMethod = meal.inputMethod || meal.method || meal.source || 'voice';
     let source = meal.source;
-    if (!source || source === 'camera' || source === 'chat' || source === 'manual') {
-      source = meal.isEstimated ? 'ai_estimate' : 'user_confirmed';
+    if (!source || source === 'camera' || source === 'chat' || source === 'manual' || source === 'voice') {
+      source = (meal.isEstimated || meal.estimated) ? 'ai_estimate' : 'user_confirmed';
     }
+    const estimated = meal.estimated !== undefined ? meal.estimated : (meal.isEstimated || false);
+    const originalTranscript = meal.originalTranscript || meal.transcript || null;
+    const quantity = Number(meal.quantity) || 1;
+    const portionUnit = meal.portionUnit || (meal.portion ? String(meal.portion).replace(/^[\d.]+\s*/, '') : 'serving');
 
     const mealDoc = {
       foodName: meal.foodName || meal.name || 'Meal Log',
       name: meal.foodName || meal.name || 'Meal Log',
-      portion: meal.portion || meal.servingSize || '1 serving',
+      quantity,
+      portionUnit,
+      portion: meal.portion || `${quantity} ${portionUnit}`,
       calories: Math.round(Number(meal.calories) || 0),
       protein: Math.round(Number(meal.protein) || 0),
       carbs: Math.round(Number(meal.carbs) || 0),
       fat: Math.round(Number(meal.fat) || 0),
-      ...(meal.fiber != null && { fiber: Math.round(Number(meal.fiber) * 10) / 10 }),
-      ...(meal.sugar != null && { sugar: Math.round(Number(meal.sugar) * 10) / 10 }),
-      ...(meal.sodium != null && { sodium: Math.round(Number(meal.sodium)) }),
+      fiber: meal.fiber != null ? Math.round(Number(meal.fiber) * 10) / 10 : 0,
+      sugar: meal.sugar != null ? Math.round(Number(meal.sugar) * 10) / 10 : 0,
+      sodium: meal.sodium != null ? Math.round(Number(meal.sodium)) : 0,
       ...(meal.confidence != null && { confidence: Math.round(Number(meal.confidence)) }),
       source,
+      estimated,
       inputMethod,
+      originalTranscript,
+      items: Array.isArray(meal.items) ? meal.items : null,
       imageUrl: meal.imageUrl || meal.image || null,
       mealType: meal.mealType || meal.type || 'Lunch',
       type: meal.mealType || meal.type || 'Lunch',

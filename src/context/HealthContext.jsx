@@ -127,14 +127,14 @@ export const HealthProvider = ({ children }) => {
   };
 
   // Log water to Firestore
-  const logWater = async (amountMl, source = 'manual') => {
+  const logWater = async (amountMl, source = 'manual', transcript = null) => {
     if (!userId) {
       showToast('Please log in to track water.', 'error');
       throw new Error('Please log in to track water.');
     }
 
     try {
-      const saved = await waterService.logWater(userId, amountMl, source);
+      const saved = await waterService.logWater(userId, amountMl, source, transcript);
       showToast(`Logged ${amountMl} ml of water!`, 'success');
       return saved;
     } catch (err) {

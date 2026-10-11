@@ -137,10 +137,10 @@ const AuthenticatedShell = () => {
               <Route path="/food-scan" element={<Navigate to="/snap-food" replace />} />
               <Route path="/food-analysis" element={<Navigate to="/snap-food" replace />} />
 
-              {/* 3. Food Chat / AI Food Logging */}
+              {/* 3. Food Chat / AI Food Logging & Voice Logging */}
               <Route path="/ai-coach" element={<AICoach />} />
               <Route path="/food-chat" element={<Navigate to="/ai-coach" replace />} />
-              <Route path="/voice-log" element={<Navigate to="/ai-coach" replace />} />
+              <Route path="/voice-log" element={<VoiceLog />} />
 
               {/* 4. Meal History */}
               <Route path="/meals" element={<Meals />} />

@@ -14,7 +14,9 @@ import {
   Edit2,
   Utensils,
   Clock,
-  AlertCircle
+  AlertCircle,
+  Mic,
+  MicOff
 } from 'lucide-react';
 
 import { useAuth } from '../hooks/useAuth';
@@ -30,11 +32,83 @@ export const AICoach = () => {
   const [messages, setMessages] = useState([]);
   const [inputText, setInputText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [isListening, setIsListening] = useState(false);
   const [editingCardId, setEditingCardId] = useState(null);
   const [editFormData, setEditFormData] = useState({});
   const [savedCardIds, setSavedCardIds] = useState(new Set());
   const [showMobileTips, setShowMobileTips] = useState(false);
   const chatEndRef = useRef(null);
+  const recognitionRef = useRef(null);
+
+  useEffect(() => {
+    return () => {
+      if (recognitionRef.current) {
+        try {
+          recognitionRef.current.abort();
+        } catch (_) {}
+      }
+    };
+  }, []);
+
+  const handleToggleVoice = () => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      showToast('Voice recognition is not supported in this browser. Please type your message.', 'warning');
+      return;
+    }
+
+    if (isListening) {
+      if (recognitionRef.current) {
+        try {
+          recognitionRef.current.stop();
+        } catch (_) {}
+      }
+      setIsListening(false);
+      return;
+    }
+
+    try {
+      const recognition = new SpeechRecognition();
+      recognition.lang = 'en-IN';
+      recognition.interimResults = true;
+      recognition.maxAlternatives = 1;
+      recognition.continuous = false;
+
+      recognition.onstart = () => {
+        setIsListening(true);
+        showToast('Microphone active. Speak your meal now!', 'info');
+      };
+
+      recognition.onresult = (event) => {
+        let currentTranscript = '';
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          currentTranscript += event.results[i][0].transcript;
+        }
+        if (currentTranscript) {
+          setInputText(currentTranscript);
+        }
+      };
+
+      recognition.onerror = (event) => {
+        setIsListening(false);
+        if (event.error === 'not-allowed') {
+          showToast('Microphone permission was denied. Please allow mic access.', 'error');
+        } else if (event.error !== 'no-speech') {
+          showToast(`Speech error: ${event.error}`, 'warning');
+        }
+      };
+
+      recognition.onend = () => {
+        setIsListening(false);
+      };
+
+      recognitionRef.current = recognition;
+      recognition.start();
+    } catch (err) {
+      setIsListening(false);
+      showToast('Could not initialize microphone.', 'error');
+    }
+  };
 
   const scrollToBottom = () => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -676,12 +750,27 @@ export const AICoach = () => {
           >
             <input
               type="text"
-              placeholder="e.g. I ate 2 rotis and 1 bowl dal for lunch..."
+              placeholder={isListening ? "Listening... Speak your meal now" : "e.g. I ate 2 rotis and 1 bowl dal for lunch..."}
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
               onKeyDown={handleKeyDown}
-              className="flex-1 px-4 py-3 text-xs sm:text-sm rounded-2xl bg-slate-100 dark:bg-slate-800/80 border border-transparent focus:border-[#087F5B] focus:bg-white dark:focus:bg-slate-900 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#087F5B]/20 transition-all"
+              className={`flex-1 px-4 py-3 text-xs sm:text-sm rounded-2xl bg-slate-100 dark:bg-slate-800/80 border text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#087F5B]/20 transition-all ${
+                isListening ? 'border-rose-500 bg-rose-50/20 animate-pulse' : 'border-transparent focus:border-[#087F5B] focus:bg-white dark:focus:bg-slate-900'
+              }`}
             />
+            {/* Functional Voice Input Microphone Button */}
+            <button
+              type="button"
+              onClick={handleToggleVoice}
+              className={`p-3 rounded-2xl font-bold shadow-md transition-all flex items-center justify-center shrink-0 ${
+                isListening
+                  ? 'bg-rose-500 hover:bg-rose-600 text-white shadow-rose-500/30 animate-pulse'
+                  : 'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200'
+              }`}
+              title={isListening ? 'Stop listening' : 'Speak your meal'}
+            >
+              {isListening ? <MicOff className="w-4 h-4 text-white" /> : <Mic className="w-4 h-4 text-[#087F5B]" />}
+            </button>
             <button
               type="submit"
               disabled={!inputText.trim() || isTyping}

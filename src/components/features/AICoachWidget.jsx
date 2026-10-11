@@ -97,25 +97,40 @@ export const AICoachWidget = ({ onClose }) => {
       return;
     }
 
+    if (isListening) {
+      setIsListening(false);
+      return;
+    }
+
     try {
       const recognition = new SpeechRecognition();
-      recognition.lang = 'en-US';
-      recognition.interimResults = false;
+      recognition.lang = 'en-IN';
+      recognition.interimResults = true;
       recognition.maxAlternatives = 1;
+      recognition.continuous = false;
 
       recognition.onstart = () => {
         setIsListening(true);
-        showToast('Listening... speak now', 'info');
+        showToast('Listening... Speak your meal now', 'info');
       };
 
       recognition.onresult = (event) => {
-        const transcript = event.results[0][0].transcript;
-        setInput(transcript);
-        handleSend(transcript);
+        let currentTranscript = '';
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          currentTranscript += event.results[i][0].transcript;
+        }
+        if (currentTranscript) {
+          setInput(currentTranscript);
+        }
       };
 
-      recognition.onerror = () => {
+      recognition.onerror = (event) => {
         setIsListening(false);
+        if (event.error === 'not-allowed') {
+          showToast('Microphone permission denied. Please allow mic access.', 'error');
+        } else if (event.error !== 'no-speech') {
+          showToast(`Speech error: ${event.error}`, 'warning');
+        }
       };
 
       recognition.onend = () => {

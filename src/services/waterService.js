@@ -19,7 +19,7 @@ export const waterService = {
    *   createdAt: timestamp
    * }
    */
-  async logWater(userId, amountMl, source = 'manual') {
+  async logWater(userId, amountMl, source = 'manual', transcript = null) {
     if (!userId) throw new Error('User ID is required to log water.');
 
     const amount = Math.max(1, Number(amountMl) || 250);
@@ -27,7 +27,9 @@ export const waterService = {
 
     const waterDoc = {
       amountMl: amount,
-      source: source === 'chat' ? 'chat' : 'manual',
+      source: source || 'manual',
+      inputMethod: source || 'manual',
+      ...(transcript && { originalTranscript: transcript }),
       date: todayDate,
       createdAt: serverTimestamp()
     };
